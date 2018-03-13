@@ -54,7 +54,7 @@ class Vehicle(object):
         if(self.lowestDistance == 0):
             return 1/(self.timeArrived)
         if self.stuck:
-            return 1/((self.lowestDistance+self.lifetime)*10)
+            return 1/((self.lowestDistance+self.lifetime)*2)
         return 1/(self.lowestDistance+self.lifetime)
     # calculate the distance between two points in 2D space
     def calcDistance(self):
