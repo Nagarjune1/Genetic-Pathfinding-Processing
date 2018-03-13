@@ -1,5 +1,5 @@
 # Genetic-Pathfinding-Processing
-Uses a genetic algorithm to find the most optimal path between two points
+Uses a genetic algorithm to find the most optimal path between two points. Uses Processing.py to display graphics
 
 Designed and coded by Kyle Thorpe, 2018
 
