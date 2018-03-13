@@ -124,7 +124,7 @@ def renderObstacle(ob):
     y2 = xy2[1]
     widthBox = abs(x2-x1)
     heightBox = abs(y2-y1)
-    stroke(255,255,255)
+    stroke(200,200,200)
     fill(200,200,200)
     rect(min(x1,x2),min(y1,y2),widthBox,heightBox)
 
@@ -168,6 +168,9 @@ def selection(P):
         fitnessList.append(fitness)
     average_distance = sum(distance_levels)/len(distance_levels)
     maxFitness = max(fitnessList)
+    if maxFitness == 0:
+        print("Max fitness is 0, returning")
+        return
     for x in range(len(fitnessList)):
         fitnessList[x] = fitnessList[x]/maxFitness
     for x in range(len(fitnessList)):
