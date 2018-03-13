@@ -12,9 +12,8 @@ class Population(object):
         size = self.lifetime * len(self.vehicles)
         DNA = []
         for i in range(size):
-            DNA.append(int(random(0,4)))
+            DNA.append(PVector.random2D())
         for i in range(len(DNA)):
             dnaIndex = i%self.lifetime
             whichVehicle = ((i-dnaIndex)/self.lifetime)
             self.vehicles[whichVehicle].DNA.append(DNA[i])
-            #print("Appending ",dnaIndex,whichVehicle,DNA[i])

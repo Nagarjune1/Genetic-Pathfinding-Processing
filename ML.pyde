@@ -13,13 +13,11 @@ from Population import Population
 mutation_rate = 0.01
 
 # how many agents per generation?
-population_size = 100
+population_size = 50
 
 # how long should each generation take?
-lifetime = 250
+lifetime = 500
 
-# how big should each cell be in pixels?
-resolution = 10
 
 # how wide should the screen be in pixels?
 width = 1280
@@ -35,22 +33,16 @@ generation = 0
 totalDistance = 0
 # average distance of all the agents
 average_distance = 0
-# number of columns(cells)
-numColumns = width/resolution
-# number of rows(cells)
-numRows = height/resolution
-# should the program display the grid to show each cell? Recommend not enabling as the text color is a bit funny right now
-showGrid = False
 # global variable which stores the Population object
 population = None
-# global list which stores the cell coordinates of all obstacles
+# global list which stores the coordinates of all obstacles
 obstacles = []
-# cell coordinates of goal cell
-goal = [int(numColumns*.9),int(numRows/2)]
-# cell coordinates of starting point cell
-startingPoint = [int(numColumns*.05),int(numRows/2)]
+# ccoordinates of goal
+goal = [int(width*.9),int(height/2)]
+# coordinates of starting point
+startingPoint = [int(width*.05),int(height/2)]
 # distance between the ending point and starting point in pixels
-toTravel = sqrt(pow((goal[0] - startingPoint[0]),2) + pow((goal[1] - startingPoint[1]),2)) * resolution
+toTravel = sqrt(pow((goal[0] - startingPoint[0]),2) + pow((goal[1] - startingPoint[1]),2))
 # current move of the current generation
 currentMove = 0
 # global variable to store coordinates of new obstacle to make while mouse is held
@@ -62,17 +54,11 @@ newObsY2 = 0
 # the setup function, this is run once at the start
 def setup():
     size(width,height)
-    background(255,255,255)
+    background(0)
     global population
     population = Population(lifetime)
-    if showGrid:
-        for x in range(width/resolution):
-            for y in range(height/resolution):
-                stroke(0,0,0)
-                fill(255,255,255)
-                rect(x*resolution,y*resolution,resolution,resolution)
-    for x in range(population_size):
-        V = Vehicle(x,startingPoint,goal,resolution,numColumns,numRows,lifetime)
+    for i in range(population_size):
+        V = Vehicle(i,startingPoint,goal,lifetime)
         population.addVehicle(V)
     population.generateDNA()
 
@@ -99,14 +85,14 @@ def mouseReleased():
     newObsX2 = mouseX
     newObsY2 = mouseY
     if newObsX2 != newObsX1 or newObsY2 != newObsY1:
-        xy1 = getCellFromCoords([newObsX1,newObsY1])
-        xy2 = getCellFromCoords([newObsX2,newObsY2])
+        xy1 = [newObsX1,newObsY1]
+        xy2 = [newObsX2,newObsY2]
         if xy1[0] == xy2[0]:
             xy2[0] += 1
         if xy1[1] == xy2[1]:
             xy2[1] += 1
         createObstacle(xy1,xy2)
-# creates an obstacle using two cell points (xy1[0],xy1[1]) and (xy2[0],xy2[1])
+# creates an obstacle using two points (xy1[0],xy1[1]) and (xy2[0],xy2[1])
 def createObstacle(xy1,xy2):
     global newObsX1
     global newObsX2
@@ -120,29 +106,31 @@ def createObstacle(xy1,xy2):
     newObsY2 = 0
 # renders a particular obstacle
 def renderObstacle(ob):
-    xy1 = getCoordsFromCell([ob[0],ob[1]])
-    xy2 = getCoordsFromCell([ob[2],ob[3]])
-    x1 = xy1[0]
-    y1 = xy1[1]
-    x2 = xy2[0]
-    y2 = xy2[1]
+    x1 = ob[0]
+    y1 = ob[1]
+    x2 = ob[2]
+    y2 = ob[3]
     widthBox = abs(x2-x1)
     heightBox = abs(y2-y1)
     stroke(200,200,200)
     fill(200,200,200)
     rect(min(x1,x2),min(y1,y2),widthBox,heightBox)
-
+# check if vehicle is out of the screen
+def outOfScreen(vehicle):
+    x = vehicle.location.x
+    y = vehicle.location.y
+    if x > width or x < 0 or y > height or y < 0:
+        return True
+    return False
 # checks to see if a point intersects with any obstacles
 def intersectObstacles(point):
     pointX = point[0]
     pointY = point[1]
     for x in obstacles:
-        xy1 = getCoordsFromCell([x[0],x[1]])
-        xy2 = getCoordsFromCell([x[2],x[3]])
-        x1 = xy1[0]
-        y1 = xy1[1]
-        x2 = xy2[0]
-        y2 = xy2[1]
+        x1 = x[0]
+        y1 = x[1]
+        x2 = x[2]
+        y2 = x[3]
         xLeft = min(x1,x2)
         xRight = max(x1,x2)
         yTop = min(y1,y2)
@@ -211,7 +199,7 @@ def selection(P):
         mom = population.vehicles[r1i]
         dad = population.vehicles[r2i]
         child_DNA = mom.crossover(dad)
-        child = Vehicle(i,startingPoint,goal,resolution,numColumns,numRows,lifetime)
+        child = Vehicle(i,startingPoint,goal,lifetime)
         child_DNA = mutate(child_DNA)
         child.inputDNA(child_DNA)
         P.addVehicle(child)
@@ -221,7 +209,7 @@ def mutate(DNA):
     for i in range(len(DNA)):
         chance = random(0.0,1.0)
         if chance < rate:
-            newMove = int(random(0,4))
+            newMove = PVector.random2D()
             DNA[i] = newMove
     return DNA
 # the draw function, this is looped continuosly until the program stops
@@ -233,13 +221,8 @@ def draw():
     global startingPoint
     global average_fitness
     global fitness_levels
+    allStuck = True
     background(0)
-    if showGrid:
-        for x in range(width/resolution):
-            for y in range(height/resolution):
-                stroke(0,0,0)
-                fill(255,255,255)
-                rect(x*resolution,y*resolution,resolution,resolution)
     for i in obstacles:
         renderObstacle(i)
     if mousePressed:
@@ -252,10 +235,16 @@ def draw():
         for x in range(len(population.vehicles)):
             vehicle = population.vehicles[x]
             if not vehicle.stuck:
+                allStuck = False
                 vehicle.move()
-                if intersectObstacles([vehicle.x,vehicle.y]):
+                if intersectObstacles([vehicle.location.x,vehicle.location.y]):
+                    vehicle.stuck = True
+                if outOfScreen(vehicle):
                     vehicle.stuck = True
             vehicle.display()
+        if allStuck:
+            print("allstuck")
+            currentMove = lifetime
         currentMove += 1
     else:
         P = Population(lifetime)
@@ -269,25 +258,8 @@ def draw():
     text(s, 20, 40)  # Text wraps within text box
     # Draw Goal cell
     stroke(0,0,0)
-    fill(255,6,2)
-    goalCoords = getCoordsFromCell([goal[0],goal[1]])
-    rect(goalCoords[0],goalCoords[1],resolution,resolution)
-# converts cell coords from pixel coords
-def getCellFromCoords(coords):
-    x = coords[0]
-    y = coords[1]
-    x = (x-(x%resolution))/resolution
-    y = (y-(y%resolution))/resolution
-    Pos = [x,y]
-    return Pos
-# converts cell coords to pixel coordinates
-def getCoordsFromCell(Pos):
-    x = Pos[0]
-    y = Pos[1]
-    x = x*resolution
-    y = y*resolution
-    Coords = [x,y]
-    return Coords
+    fill(0,255,100)
+    ellipse(goal[0],goal[1],10,10)
     
     
     
