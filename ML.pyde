@@ -234,6 +234,7 @@ def draw():
     if(currentMove < lifetime):
         for x in range(len(population.vehicles)):
             vehicle = population.vehicles[x]
+            # if the vehicle is not stuck, calculate the new position in vehicle.move() and then check if it is stuck in an obstacle or stuck into the edge of the screen
             if not vehicle.stuck:
                 allStuck = False
                 vehicle.move()
@@ -256,7 +257,7 @@ def draw():
     s = "Lifetime length "+str(lifetime)+"\nCurrent move "+str(currentMove)+"\nGeneration "+str(generation)+"\nAverage Fitness "+str(average_distance*100)+"%\nPopulation Size "+str(population_size)+"\nMutation Rate "+str(mutation_rate*100)+"%"
     textSize(32)
     text(s, 20, 40)  # Text wraps within text box
-    # Draw Goal cell
+    # Draw Goal circle
     stroke(0,0,0)
     fill(0,255,100)
     ellipse(goal[0],goal[1],10,10)
