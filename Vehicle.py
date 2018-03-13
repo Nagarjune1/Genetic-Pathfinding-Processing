@@ -1,8 +1,14 @@
 class Vehicle(object):
+    # how many moves have been made by this vehicle
     lifetime = None
+    # the closest this vehicle has gotten to the goal cell
     lowestDistance = None
+    # how long it took the vehicle to make it to the goal cell
     timeArrived = None
+    # if the vehicle has arrived to the goal cell
     arrived = False
+    # if the vehicle has run into an obstacle
+    stuck = False
     id = None
     resolution = 0
     numColumns = 0
@@ -28,6 +34,7 @@ class Vehicle(object):
         self.lowestDistance = numColumns*numRows*resolution
         self.DNA = []
         self.display()
+    # crossover this vehicle with another vehicle - mate
     def crossover(self, mate):
         child_DNA = []
         mom_DNA = self.DNA
@@ -39,21 +46,26 @@ class Vehicle(object):
             else:
                 child_DNA.append(dad_DNA[i])
         return child_DNA
+    # set the DNA of this vehicle
     def inputDNA(self,DNA):
         self.DNA = DNA
+    # calculate the fitness of this vehicle
     def calcFitness(self):
         if(self.lowestDistance == 0):
-            return 1/(self.timeArrived/self.resolution)
-        return 1/((self.lowestDistance+self.lifetime)/self.resolution)
+            return 1/(self.timeArrived)
+        if self.stuck:
+            return 0
+        return 1/(self.lowestDistance+self.lifetime)
+    # calculate the distance between two points in 2D space
     def calcDistance(self):
         goalCoords = self.getCoordsFromCell(self.goal)
         self.updateCoordsFromCell()
-        #d = pow(pow((self.x - goalCoords[0]),2) + pow((self.y - goalCoords[1]),2),(1/2))
         d = (self.x - goalCoords[0])
         d = pow(d,2)
         d = d + pow((self.y - goalCoords[1]),2)
         d = sqrt(d)
         return d
+    # convert pixel coordinates to cell coordinates
     def getCellFromCoords(self, coords):
         x = coords[0]
         y = coords[1]
@@ -61,6 +73,7 @@ class Vehicle(object):
         y = (y-(y%self.resolution))/self.resolution
         Pos = [x,y]
         return Pos
+    # convert cell coordinates to pixel coordinates
     def getCoordsFromCell(self, Pos):
         x = Pos[0]
         y = Pos[1]
@@ -68,15 +81,18 @@ class Vehicle(object):
         y = y*self.resolution
         Coords = [x,y]
         return Coords
+    # update the pixel coordinate variables from the cell coordinate variables
     def updateCoordsFromCell(self):
         newCoords = self.getCoordsFromCell([self.col,self.row])
         self.x = newCoords[0]
         self.y = newCoords[1]
+    # update the cell coordinate variables from the pixel coordinate variables
     def updateCellFromCoords(self):
         Coords = [self.x,self.y]
         newCell = self.getCellFromCoords(Coords)
         self.col = newCell[0]
         self.row = newCell[1]
+    # calculate the next move and update the current location
     def move(self):
         if self.arrived:
             return 1
@@ -105,7 +121,7 @@ class Vehicle(object):
             print(self.id,self.currentMove)
             self.arrived = True
             self.timeArrived = self.currentMove
-        
+    # print the vehicle
     def display(self):
         #print(self.col,self.row)
         Pos = self.getCoordsFromCell([self.col,self.row])
@@ -113,4 +129,6 @@ class Vehicle(object):
         y = Pos[1]
         stroke(0,0,0)
         fill(11,224,36)
+        if self.stuck:
+            fill(50,50,200)
         rect(x,y,self.resolution,self.resolution)

@@ -4,8 +4,10 @@ class Population(object):
     def __init__(self,lifetime):
         self.lifetime = lifetime
         self.vehicles = []
+    # add a particular vehicle to the vehicle list of this Population
     def addVehicle(self,vehicle):
         self.vehicles.append(vehicle)
+    # generate DNA for all of the vehicles in the global vehicle list of this Population
     def generateDNA(self):
         size = self.lifetime * len(self.vehicles)
         DNA = []
