@@ -6,15 +6,14 @@ Designed and coded by Kyle Thorpe, 2018
 **TODO**
 - Change crossover function to handle obstacles better
 - Optimize fitness function
-- Change vehicles into circles which 'fly' around according to a vector (use flowfields to implement this)
-- Change how obstacles are stored. Instead of keeping track of two points, keep track of all of the cells.
 
 
 **Usage**
-1. Download the Python Processing. http://py.processing.org/tutorials/gettingstarted/
+1. Download the Python version of Processing. http://py.processing.org/tutorials/gettingstarted/
 2. When Processing is running and in Python mode, open ML.pyde
-3. Click run
-4. Use the mouse to make obstacles. Click and hold will start the obstacle box, release the mouse to complete it
+3. Change the settings in ML.pyde. Depending on your system, a population size between 100 and 1000 is good. A Mutation Rate of 0.01 is recommended
+4. Click run
+5. Use the mouse to make obstacles. Click and hold will start the obstacle box, release the mouse to complete it
 
 
 <img src="genetic.gif" alt="GIF" title="Preview of Program" />
