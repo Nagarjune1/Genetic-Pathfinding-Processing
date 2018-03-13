@@ -31,8 +31,8 @@ height = 1280
 
 # current generation number
 generation = 0
-# distance of each agent
-distance_levels = []
+# total distance of all of the agents from all of the generations
+totalDistance = 0
 # average distance of all the agents
 average_distance = 0
 # number of columns(cells)
@@ -101,8 +101,12 @@ def mouseReleased():
     if newObsX2 != newObsX1 or newObsY2 != newObsY1:
         xy1 = getCellFromCoords([newObsX1,newObsY1])
         xy2 = getCellFromCoords([newObsX2,newObsY2])
+        if xy1[0] == xy2[0]:
+            xy2[0] += 1
+        if xy1[1] == xy2[1]:
+            xy2[1] += 1
         createObstacle(xy1,xy2)
-# creates an obstacle using two points (xy1[0],xy1[1]) and (xy2[0],xy2[1])
+# creates an obstacle using two cell points (xy1[0],xy1[1]) and (xy2[0],xy2[1])
 def createObstacle(xy1,xy2):
     global newObsX1
     global newObsX2
@@ -157,16 +161,16 @@ def newGeneration(P):
 # randomly select parents from the current population and create a new population
 def selection(P):
     global average_distance
-    global distance_levels
+    global totalDistance
     #Selection
     # list which contains a fitness level for each vehicle/agent
     fitnessList = []
     for x in population.vehicles:
         fitness = x.calcFitness()
-        distance = (toTravel - x.lowestDistance)/toTravel
-        distance_levels.append(distance)
         fitnessList.append(fitness)
-    average_distance = sum(distance_levels)/len(distance_levels)
+        distance = (toTravel - x.lowestDistance)/toTravel
+        totalDistance += distance
+    average_distance = totalDistance/(population_size*(generation+1))
     maxFitness = max(fitnessList)
     if maxFitness == 0:
         print("Max fitness is 0, returning")

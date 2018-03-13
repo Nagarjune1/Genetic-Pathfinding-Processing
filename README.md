@@ -7,6 +7,7 @@ Designed and coded by Kyle Thorpe, 2018
 - Change crossover function to handle obstacles better
 - Optimize fitness function
 - Change vehicles into circles which 'fly' around according to a vector (use flowfields to implement this)
+- Change how obstacles are stored. Instead of keeping track of two points, keep track of all of the cells.
 
 
 **Usage**
